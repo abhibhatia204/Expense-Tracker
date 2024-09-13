@@ -1,7 +1,10 @@
-from expense import Expense
+﻿from expense import Expense
+import calendar
+import datetime
 def main():
     print(f"👑 Running Expense Tracker!")
     expense_file_path = "expenses.csv"
+    budget = 3000
     
     # Get user input for expense
     expense = get_user_expense()
@@ -10,11 +13,11 @@ def main():
     save_expense_to_a_file(expense,expense_file_path)
     
     # Read file and summarize expenses
-    summarize_expenses(expense_file_path)
+    summarize_expenses(expense_file_path,budget)
 
 
 def get_user_expense():
-    print(f"Getting User Expense")
+    print(f"✌  Getting User Expense")
     expense_name = input("Enter expense name: ")
     expense_amount = float(input("Enter expense amount: "))
     
@@ -43,22 +46,56 @@ def get_user_expense():
 
 
 def save_expense_to_a_file(expense:Expense,expense_file_path):
-    print(f"Saving User Expenses: {expense} to {expense_file_path}")
-    with open(expense_file_path,"a") as f:
+    print(f"👑 Saving User Expenses: {expense} to {expense_file_path}")
+    with open(expense_file_path,"a",encoding='utf-8') as f:
         f.write(f"{expense.name},{expense.amount},{expense.category}\n")
 
-def summarize_expenses(expense_file_path):
-    print(f"Summarizing User Expenses")
-    expenses = []
-    with open(expense_file_path,"r") as f:
+def summarize_expenses(expense_file_path,budget):
+    print(f"👑 Summarizing User Expenses")
+    expenses : list[Expense]= []
+    with open(expense_file_path,"r",encoding='utf-8') as f:
         lines = f.readlines()
         for line in lines:
             expense_name , expense_amount, expense_category = line.strip().split(",")
             line_expense = Expense(name=expense_name,amount=float(expense_amount),category=expense_category)
-            print(line_expense)
             expenses.append(line_expense)
-    print(expenses)
     
+    amount_by_category ={}
+    for expense in expenses:
+        key = expense.category
+        if key in amount_by_category:
+            amount_by_category[key] += expense.amount
+        else:
+            amount_by_category[key] = expense.amount
+    
+    print("Expenses By Category 💹:")
+    for key, amount in amount_by_category.items():
+        print(f"  {key}: ₹{amount:.2f}")
+        
+    total_spent = sum([x.amount for x in expenses])
+    print(f"💎 Total spent ₹{total_spent:.2f}")
+    
+    remaining_budget = budget-total_spent
+    print(f"💵 Budget Remaining: ₹{remaining_budget:.2f}")
+    
+    if remaining_budget<1000:
+        print(red("🥺😢 Savings are getiing low. Use money carefully!"))
+    
+    # Get the current date
+    now = datetime.datetime.now()
+    
+    days_in_month = calendar.monthrange(now.year, now.month)[1]
+    remaining_days = days_in_month - now.day
+    
+    daily_budget = remaining_budget / remaining_days
+    if remaining_budget<=1000:
+        print(red(f"👉 Budget per Day: ₹{daily_budget:.2f}"))
+    else:
+        print(green(f"👉 Budget per Day: ₹{daily_budget:.2f}"))
+def green(text):
+    return f"\033[92m{text}\033[0m"
+def red(text):
+    return f"\033[31m{text}\033[0m"
 
 if __name__ == "__main__": #this runs only when we run this file not when we run it as part of another file
     main()
