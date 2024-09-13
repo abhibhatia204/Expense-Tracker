@@ -79,7 +79,7 @@ def summarize_expenses(expense_file_path,budget):
     print(f"💵 Budget Remaining: ₹{remaining_budget:.2f}")
     
     if remaining_budget<1000:
-        print(red("🥺😢 Savings are getiing low. Use money carefully!"))
+        print(red("🥺😢 Savings are getting low. Use money carefully!"))
     
     # Get the current date
     now = datetime.datetime.now()
